@@ -1,4 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import ReactMarkdown from "react-markdown";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
 import { useEffect, useRef, useState } from "react";
 import { IconButton } from "@mui/material";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
@@ -243,7 +246,13 @@ function MessageBubble({ msg }: { msg: ChatMessage }) {
             ))}
           </ImageGrid>
         ) : null}
-        {msg.text ? <Bubble isStudent={isStudent}>{msg.text}</Bubble> : null}
+        {msg.text ? (
+          <Bubble isStudent={isStudent}>
+            <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
+              {msg.text}
+            </ReactMarkdown>
+          </Bubble>
+        ) : null}
       </BubbleStack>
     </Row>
   );

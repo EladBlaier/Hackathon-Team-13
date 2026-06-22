@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Body, Depends, File, Form, HTTPException, Path, UploadFile, status
 
 from app.dependencies import get_conversation_service, get_tutor_ai_service
-from app.exceptions import ConversationNotFoundError
 from app.schemas.images import ImageUpload
 from app.schemas.tutor import (
     ConversationHistory,
@@ -71,18 +70,6 @@ async def get_conversation_history(
     return await service.get_history(student_id, conversation_id)
 
 
-def _render_history(history: ConversationHistory, max_turns: int = 3) -> str:
-    """Compact recent-turn transcript that primes the tutor on follow-ups."""
-    lines: list[str] = []
-    for item in history.history[-max_turns:]:
-        if item.homework_files:
-            lines.append(f"Turn {item.turn}: student shared homework photo(s).")
-        reply = (item.ai_feedback or {}).get("reply") if item.ai_feedback else None
-        if reply:
-            lines.append(f"Tutor: {reply}")
-    return "\n".join(lines)
-
-
 @router.post(
     "/{conversation_id}/turn",
     summary="Post Conversation Turn",
@@ -136,26 +123,16 @@ async def post_conversation_turn(
             detail="A turn needs at least one image or a text message.",
         )
 
-    # Prior turns prime the tutor on text-only follow-ups.
-    history_text = ""
-    try:
-        history = await service.get_history(student_id, conversation_id)
-        history_text = _render_history(history)
-    except ConversationNotFoundError:
-        history_text = ""
-
+    # The "brain" loads its own memory (profile + context) and folds this turn
+    # back into it; the student's typed message is recorded inside run_turn.
     first_image = uploads[0] if uploads else None
-    feedback_data = await ai.generate_feedback(
+    feedback_data = await ai.run_turn(
+        student_id=student_id,
+        conversation_id=conversation_id,
         image=first_image.data if first_image else None,
         image_mime=first_image.content_type if first_image else "image/jpeg",
         student_text=student_text,
-        history_text=history_text,
     )
-
-    # Persist the student's typed message alongside the feedback so reloaded
-    # history can reconstruct text-only turns (images are stored separately).
-    if student_text.strip():
-        feedback_data["student_text"] = student_text
 
     return await service.post_turn(
         student_id=student_id,
