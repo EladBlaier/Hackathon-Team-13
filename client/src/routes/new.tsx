@@ -23,7 +23,7 @@ import {
 } from "./new.style";
 
 export const Route = createFileRoute("/new")({
-  head: () => ({ meta: [{ title: "New homework — MathPal" }] }),
+  head: () => ({ meta: [{ title: "New homework — Hintly" }] }),
   component: NewHomeworkPage,
 });
 

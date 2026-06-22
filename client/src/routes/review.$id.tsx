@@ -32,7 +32,7 @@ import {
 } from "./review.$id.style";
 
 export const Route = createFileRoute("/review/$id")({
-  head: () => ({ meta: [{ title: "Review — MathPal" }] }),
+  head: () => ({ meta: [{ title: "Review — Hintly" }] }),
   component: ReviewPage,
 });
 
@@ -117,7 +117,7 @@ function ReviewPage() {
           <InfoBanner>
             <AutoAwesomeIcon sx={{ fontSize: 16, mt: "2px", flexShrink: 0 }} />
             <span>
-              MathPal is reviewing your work. Ask questions, share more photos, or walk through your
+              Hintly is reviewing your work. Ask questions, share more photos, or walk through your
               steps.
             </span>
           </InfoBanner>
@@ -165,7 +165,7 @@ function ReviewPage() {
                   send();
                 }
               }}
-              placeholder="Ask MathPal anything…"
+              placeholder="Ask Hintly anything…"
               multiline
               maxRows={5}
             />
