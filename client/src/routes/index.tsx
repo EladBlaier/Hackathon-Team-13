@@ -41,7 +41,7 @@ function LoginPage() {
     if (!id.trim()) return;
     setLoading(true);
     await login(id.trim());
-    navigate({ to: role === "teacher" ? "/teacher-home" : "/home" });
+    navigate({ to: role === "teacher" ? "/teacherHome" : "/home" });
   }
 
   return (
