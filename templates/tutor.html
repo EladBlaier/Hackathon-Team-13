@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Your Math Tutor</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <main class="card">
+    <h1>Snap a solved problem 📸</h1>
+    <p class="muted">Upload a photo of your work. Your tutor will help you fix any mistakes — without just handing over the answer.</p>
+
+    <form id="tutor-form">
+      <label class="upload">
+        <input type="file" id="photo" name="photo" accept="image/*" capture="environment" required />
+        <span>Choose / take a photo</span>
+      </label>
+      <button type="submit">Ask my tutor</button>
+    </form>
+
+    <p id="status" class="muted" hidden>Reading your work…</p>
+
+    <section id="result" hidden>
+      <div id="verdict" class="verdict"></div>
+      <div id="reply" class="reply"></div>
+      <div id="next" class="muted"></div>
+    </section>
+
+    <p><a href="/onboarding">Change how I learn</a></p>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

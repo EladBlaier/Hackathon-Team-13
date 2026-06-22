@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Getting to know you — Math Tutor</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <main class="card">
+    <h1>Let's get to know you 👋</h1>
+    <p class="muted">A few quick questions so your tutor explains things your way.</p>
+
+    <form method="post" action="/onboarding">
+      <label>Your name
+        <input type="text" name="name" placeholder="Alex" />
+      </label>
+
+      <label>How do you like things explained?
+        <select name="style">
+          <option value="visual">With pictures &amp; analogies</option>
+          <option value="step_by_step" selected>One small step at a time</option>
+          <option value="socratic">Let me figure it out with hints</option>
+        </select>
+      </label>
+
+      <label>Grade
+        <select name="grade">
+          <option>5</option>
+          <option selected>6</option>
+          <option>7</option>
+          <option>8</option>
+        </select>
+      </label>
+
+      <label>Pace
+        <select name="pace">
+          <option value="slow">Slow &amp; careful</option>
+          <option value="normal" selected>Normal</option>
+          <option value="fast">Fast</option>
+        </select>
+      </label>
+
+      <label>How confident are you in math?
+        <select name="confidence">
+          <option value="low">Not very</option>
+          <option value="med" selected>Somewhat</option>
+          <option value="high">Pretty confident</option>
+        </select>
+      </label>
+
+      <button type="submit">Start learning →</button>
+    </form>
+  </main>
+</body>
+</html>
