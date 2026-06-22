@@ -5,9 +5,11 @@ from fastapi import Depends
 
 from app.config import Settings, settings
 from app.services.async_s3_service import AsyncS3Service
+from app.services.auth_service import AuthService
 from app.services.context_service import ContextService
 from app.services.conversation_service import ConversationService
 from app.services.profile_service import ProfileService
+from app.services.teacher_service import TeacherService
 from app.services.tutor_ai_service import TutorAIService
 
 _s3_session = aioboto3.Session()
@@ -55,6 +57,20 @@ def get_context_service(
 ) -> ContextService:
     """Dependency provider for the per-conversation managed-history store."""
     return ContextService(s3, settings, conversations)
+
+
+def get_auth_service(
+    s3: AsyncS3Service = Depends(get_async_s3_service),
+    settings: Settings = Depends(get_settings),
+) -> AuthService:
+    return AuthService(s3, settings)
+
+
+def get_teacher_service(
+    s3: AsyncS3Service = Depends(get_async_s3_service),
+    settings: Settings = Depends(get_settings),
+) -> TeacherService:
+    return TeacherService(s3, settings)
 
 
 def get_tutor_ai_service(

@@ -6,4 +6,3 @@ build
 .next
 *.log
 .env
-package-lock.json

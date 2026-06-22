@@ -28,6 +28,18 @@ def profile_key(student_id: str) -> str:
     return f"students/{student_id}/profile.json"
 
 
+def auth_key(username: str) -> str:
+    return f"auth/{username}.json"
+
+
+def auth_by_id_key(user_id: str) -> str:
+    return f"auth_by_id/{user_id}.json"
+
+
+def teacher_profile_key(teacher_id: str) -> str:
+    return f"teachers/{teacher_id}/profile.json"
+
+
 def context_key(student_id: str, conversation_id: str) -> str:
     """Per-conversation managed-history file. Lives inside the conversation prefix
     but is ignored by turn parsing (it matches no turn_* pattern)."""

@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     s3_secret_key: str = "local-s3-secret-key"
     s3_region: str = "us-east-1"
     s3_default_bucket: str = "math-tutor-assets"
+    s3_teachers_bucket: str = "teachers"
 
     # --- Tutor "brain" harness toggles (see services/tutor_ai_service.py) -----
     # Gate the extra free-tier model calls so the demo stays within rate limits.

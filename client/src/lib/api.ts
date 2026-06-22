@@ -28,23 +28,38 @@ export interface Homework {
 
 export interface User {
   id: string;
+  username: string;
+  role: "student" | "teacher";
 }
 
 const USER_KEY = "mh_user";
 const uid = () => Math.random().toString(36).slice(2, 10);
 
 export const api = axios.create({
-  // Defaults to the local backend in dev; set VITE_API_URL to the deployed
-  // backend URL in production.
   baseURL: import.meta.env.VITE_API_URL ?? "http://localhost:8000",
 });
 
 // ---------- AUTH ----------
-export async function login(id: string): Promise<User> {
-  const user: User = { id };
+export async function login(username: string, password: string): Promise<User> {
+  const { data } = await api.post<{ user_id: string; username: string; role: string }>(
+    "/auth/login",
+    { username, password },
+  );
+  const user: User = { id: data.user_id, username: data.username, role: data.role as User["role"] };
   localStorage.setItem(USER_KEY, JSON.stringify(user));
   return user;
 }
+
+export async function signup(username: string, password: string, role: "student" | "teacher"): Promise<User> {
+  const { data } = await api.post<{ user_id: string; username: string; role: string }>(
+    "/auth/register",
+    { username, password, role },
+  );
+  const user: User = { id: data.user_id, username: data.username, role: data.role as User["role"] };
+  localStorage.setItem(USER_KEY, JSON.stringify(user));
+  return user;
+}
+
 export function getUser(): User | null {
   if (typeof window === "undefined") return null;
   try {
@@ -61,6 +76,27 @@ function studentId(): string {
   const id = getUser()?.id;
   if (!id) throw new Error("Not logged in");
   return id;
+}
+
+// ---------- TEACHER ----------
+export interface StudentEntry {
+  user_id: string;
+  username: string;
+}
+
+export async function getTeacherStudents(teacherId: string): Promise<StudentEntry[]> {
+  const { data } = await api.get<StudentEntry[]>(`/teachers/${teacherId}/students`);
+  return data;
+}
+
+export async function addStudentToTeacher(teacherId: string, username: string): Promise<StudentEntry[]> {
+  const { data } = await api.post<StudentEntry[]>(`/teachers/${teacherId}/students`, { username });
+  return data;
+}
+
+export async function removeStudentFromTeacher(teacherId: string, studentId: string): Promise<StudentEntry[]> {
+  const { data } = await api.delete<StudentEntry[]>(`/teachers/${teacherId}/students/${studentId}`);
+  return data;
 }
 
 // ---------- backend payload shapes ----------
