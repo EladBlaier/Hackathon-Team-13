@@ -58,7 +58,7 @@ function LoginPage() {
             Your friendly math homework buddy
           </Typography>
         </Brand>
-        <FormCard component="form" onSubmit={handleSubmit} elevation={0}>
+        <FormCard onSubmit={handleSubmit}>
           <TextField
             label="Your name"
             value={name}
