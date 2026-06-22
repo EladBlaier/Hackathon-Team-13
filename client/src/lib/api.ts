@@ -14,7 +14,7 @@ export interface ChatMessage {
 export interface Homework {
   id: string;
   title: string;
-  subject: string;
+  tags: string[];
   status: HomeworkStatus;
   coverImage?: string;
   images: string[];
@@ -79,7 +79,7 @@ export async function getHomework(id: string): Promise<Homework | null> {
 
 export async function createHomework(input: {
   title: string;
-  subject: string;
+  tags: string[];
   images: string[];
 }): Promise<Homework> {
   await delay();
@@ -87,7 +87,7 @@ export async function createHomework(input: {
   const hw: Homework = {
     id: uid(),
     title: input.title || "Untitled homework",
-    subject: input.subject || "Math",
+    tags: input.tags || [],
     status: "reviewing",
     coverImage: input.images[0],
     images: input.images,

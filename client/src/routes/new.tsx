@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useRef, useState } from "react";
-import { Button, TextField, MenuItem, Typography } from "@mui/material";
+import { Button, TextField, Typography, Autocomplete, Chip } from "@mui/material";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import CloseIcon from "@mui/icons-material/Close";
@@ -23,14 +23,24 @@ import {
 } from "./new.style";
 
 export const Route = createFileRoute("/new")({
-  head: () => ({ meta: [{ title: "New homework — MathPal" }] }),
+  head: () => ({ meta: [{ title: "New homework — Hintly" }] }),
   component: NewHomeworkPage,
 });
+
+const SUGGESTED_TAGS = [
+  "Math",
+  "Algebra",
+  "Geometry",
+  "Pre-Algebra",
+  "Statistics",
+  "Calculus",
+  "Trigonometry",
+];
 
 function NewHomeworkPage() {
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
-  const [subject, setSubject] = useState("Math");
+  const [tags, setTags] = useState<string[]>([]);
   const [images, setImages] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const cameraRef = useRef<HTMLInputElement>(null);
@@ -55,7 +65,7 @@ function NewHomeworkPage() {
     setSubmitting(true);
     const hw = await createHomework({
       title: title.trim() || `Homework — ${new Date().toLocaleDateString()}`,
-      subject,
+      tags,
       images,
     });
     navigate({ to: "/review/$id", params: { id: hw.id } });
@@ -72,18 +82,31 @@ function NewHomeworkPage() {
             onChange={(e) => setTitle(e.target.value)}
             placeholder="e.g. Chapter 4 — Fractions"
           />
-          <TextField
-            select
-            label="Subject"
-            value={subject}
-            onChange={(e) => setSubject(e.target.value)}
-          >
-            {["Math", "Algebra", "Geometry", "Pre-Algebra", "Statistics"].map((s) => (
-              <MenuItem key={s} value={s}>
-                {s}
-              </MenuItem>
-            ))}
-          </TextField>
+          <Autocomplete
+            multiple
+            freeSolo
+            options={SUGGESTED_TAGS}
+            value={tags}
+            onChange={(_, newValue) => setTags(newValue)}
+            renderTags={(value, getTagProps) =>
+              value.map((option, index) => (
+                <Chip
+                  variant="outlined"
+                  size="small"
+                  label={option}
+                  {...getTagProps({ index })}
+                  key={option}
+                />
+              ))
+            }
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Tags"
+                placeholder={tags.length === 0 ? "e.g. Math, Fractions" : ""}
+              />
+            )}
+          />
         </FieldGroup>
 
         <div>

@@ -32,7 +32,7 @@ import {
 } from "./home.style";
 
 export const Route = createFileRoute("/home")({
-  head: () => ({ meta: [{ title: "Home — MathPal" }] }),
+  head: () => ({ meta: [{ title: "Home — Hintly" }] }),
   component: HomePage,
 });
 
@@ -53,7 +53,7 @@ function HomePage() {
 
   return (
     <PageRoot>
-      <AppHeader title="MathPal" showLogout />
+      <AppHeader title="Hintly" showLogout />
       <Main>
         <Greeting>
           <Typography variant="body2" color="text.secondary">
@@ -110,10 +110,6 @@ function HomePage() {
           )}
         </section>
       </Main>
-
-      <Floating color="primary" aria-label="Add homework" onClick={() => navigate({ to: "/new" })}>
-        <AddIcon />
-      </Floating>
     </PageRoot>
   );
 }

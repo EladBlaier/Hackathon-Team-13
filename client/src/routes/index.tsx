@@ -7,9 +7,9 @@ import { PageRoot, Container, Brand, LogoMark, FormCard, Hint } from "./index.st
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "MathPal — Homework Helper" },
+      { title: "Hintly — Homework Helper" },
       { name: "description", content: "Snap your math homework, get guided AI tutoring." },
-      { property: "og:title", content: "MathPal — Homework Helper" },
+      { property: "og:title", content: "Hintly — Homework Helper" },
       { property: "og:description", content: "Snap your math homework, get guided AI tutoring." },
     ],
   }),
@@ -40,7 +40,7 @@ function LoginPage() {
         <Brand>
           <LogoMark>π</LogoMark>
           <Typography variant="h4" component="h1">
-            MathPal
+            Hintly
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
             Your friendly math homework buddy
