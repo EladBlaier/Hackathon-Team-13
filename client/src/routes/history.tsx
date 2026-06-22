@@ -6,7 +6,7 @@ import { HomeworkCard } from "./home";
 import { PageRoot, Main, Grid2, SkeletonTile, EmptyText } from "./history.style";
 
 export const Route = createFileRoute("/history")({
-  head: () => ({ meta: [{ title: "History — MathPal" }] }),
+  head: () => ({ meta: [{ title: "History — Hintly" }] }),
   component: HistoryPage,
 });
 

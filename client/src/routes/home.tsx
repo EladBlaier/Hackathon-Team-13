@@ -32,7 +32,7 @@ import {
 } from "./home.style";
 
 export const Route = createFileRoute("/home")({
-  head: () => ({ meta: [{ title: "Home — MathPal" }] }),
+  head: () => ({ meta: [{ title: "Home — Hintly" }] }),
   component: HomePage,
 });
 
@@ -40,6 +40,7 @@ function HomePage() {
   const navigate = useNavigate();
   const [homeworks, setHomeworks] = useState<Homework[] | null>(null);
   const user = typeof window !== "undefined" ? getUser() : null;
+  console.log(user);
 
   useEffect(() => {
     if (typeof window !== "undefined" && !getUser()) {
@@ -53,12 +54,9 @@ function HomePage() {
 
   return (
     <PageRoot>
-      <AppHeader title="MathPal" showLogout />
+      <AppHeader title="Hintly" showLogout />
       <Main>
         <Greeting>
-          <Typography variant="body2" color="text.secondary">
-            Hi {user?.name ?? "there"} 👋
-          </Typography>
           <Typography variant="h5" component="h2" sx={{ fontWeight: 700 }}>
             Ready to tackle some math?
           </Typography>
@@ -110,10 +108,6 @@ function HomePage() {
           )}
         </section>
       </Main>
-
-      <Floating color="primary" aria-label="Add homework" onClick={() => navigate({ to: "/new" })}>
-        <AddIcon />
-      </Floating>
     </PageRoot>
   );
 }

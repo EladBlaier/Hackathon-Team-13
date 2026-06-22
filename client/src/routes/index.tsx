@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
-import { Button, TextField, MenuItem, Typography } from "@mui/material";
+import { Button, TextField, Typography } from "@mui/material";
 import { login, getUser } from "@/lib/api";
 import { PageRoot, Container, Brand, LogoMark, FormCard, Hint } from "./index.style";
 
@@ -9,7 +9,7 @@ export const Route = createFileRoute("/")({
     meta: [
       { title: "Hintly — Homework Helper" },
       { name: "description", content: "Snap your math homework, get guided AI tutoring." },
-      { property: "og:title", content: "MathPal — Homework Helper" },
+      { property: "og:title", content: "Hintly — Homework Helper" },
       { property: "og:description", content: "Snap your math homework, get guided AI tutoring." },
     ],
   }),
@@ -18,8 +18,7 @@ export const Route = createFileRoute("/")({
 
 function LoginPage() {
   const navigate = useNavigate();
-  const [name, setName] = useState("");
-  const [grade, setGrade] = useState("7");
+  const [id, setId] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -28,9 +27,9 @@ function LoginPage() {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!name.trim()) return;
+    if (!id.trim()) return;
     setLoading(true);
-    await login(name.trim(), grade);
+    await login(id.trim());
     navigate({ to: "/home" });
   }
 
@@ -40,7 +39,7 @@ function LoginPage() {
         <Brand>
           <LogoMark>π</LogoMark>
           <Typography variant="h4" component="h1">
-            MathPal
+            Hintly
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
             Your friendly math homework buddy
@@ -48,19 +47,13 @@ function LoginPage() {
         </Brand>
         <FormCard onSubmit={handleSubmit}>
           <TextField
-            label="Your name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="e.g. Alex"
+            label="Your ID"
+            value={id}
+            onChange={(e) => setId(e.target.value)}
+            placeholder="e.g. 123456"
             autoFocus
           />
-          <TextField select label="Grade" value={grade} onChange={(e) => setGrade(e.target.value)}>
-            <MenuItem value="6">6th grade</MenuItem>
-            <MenuItem value="7">7th grade</MenuItem>
-            <MenuItem value="8">8th grade</MenuItem>
-            <MenuItem value="9">9th grade</MenuItem>
-          </TextField>
-          <Button type="submit" variant="contained" size="large" disabled={loading || !name.trim()}>
+          <Button type="submit" variant="contained" size="large" disabled={loading || !id.trim()}>
             {loading ? "Signing in…" : "Let's go"}
           </Button>
         </FormCard>
