@@ -21,6 +21,8 @@ export const Route = createFileRoute("/")({
   component: LoginPage,
 });
 
+type Role = "student" | "teacher";
+
 function LoginPage() {
   const navigate = useNavigate();
   const [mode, setMode] = useState<"login" | "signup">("login");
