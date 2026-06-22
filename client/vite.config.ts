@@ -14,7 +14,7 @@ export default defineConfig({
   },
   vite: {
     ssr: {
-      noExternal: ['react-transition-group', '@mui/material'],
+      noExternal: ["react-transition-group", "@mui/material"],
     },
   },
 });
