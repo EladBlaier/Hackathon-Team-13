@@ -45,6 +45,7 @@ type StudentStatus = {
 function getMockStatus(id: string): StudentStatus {
   return {
     id,
+    name: "Tom Malki",
     summary:
       "Over the last few sessions, this student has been engaging consistently with multi-step algebra problems and is starting to show more confidence working independently before asking for hints. Fraction operations remain a recurring sticking point, especially when mixed with negative numbers.",
     improving: [
@@ -93,7 +94,6 @@ function StudentStatusPage() {
           </AvatarCircle>
           <HeaderInfo>
             <HeaderId>{status.name ?? status.id}</HeaderId>
-            <HeaderSub>{status.name ? `ID: ${status.id}` : "Student"}</HeaderSub>
           </HeaderInfo>
         </HeaderCard>
 
