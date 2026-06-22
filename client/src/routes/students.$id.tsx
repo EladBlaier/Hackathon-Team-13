@@ -78,14 +78,14 @@ function StudentStatusPage() {
   if (!status) {
     return (
       <PageRoot>
-        <AppHeader title="Loading…" back="/teacherHome" />
+        <AppHeader title="Loading…" back="/teacher" />
       </PageRoot>
     );
   }
 
   return (
     <PageRoot>
-      <AppHeader title="Student progress" back="/teacherHome" />
+      <AppHeader title="Student progress" back="/teacher" />
       <Main>
         <HeaderCard>
           <AvatarCircle>
