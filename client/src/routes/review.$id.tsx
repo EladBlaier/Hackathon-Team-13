@@ -3,7 +3,7 @@ import ReactMarkdown from "react-markdown";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import { useEffect, useRef, useState } from "react";
-import { IconButton } from "@mui/material";
+import { Dialog, IconButton } from "@mui/material";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import SendIcon from "@mui/icons-material/Send";
@@ -236,13 +236,14 @@ function ReviewPage() {
 
 function MessageBubble({ msg }: { msg: ChatMessage }) {
   const isStudent = msg.role === "student";
+  const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
   return (
     <Row isStudent={isStudent}>
       <BubbleStack isStudent={isStudent}>
         {msg.images && msg.images.length > 0 ? (
           <ImageGrid multi={msg.images.length > 1}>
             {msg.images.map((src, i) => (
-              <BubbleImage key={i} src={src} alt="" />
+              <BubbleImage key={i} src={src} alt="" onClick={() => setLightboxSrc(src)} />
             ))}
           </ImageGrid>
         ) : null}
@@ -254,6 +255,35 @@ function MessageBubble({ msg }: { msg: ChatMessage }) {
           </Bubble>
         ) : null}
       </BubbleStack>
+
+      <Dialog
+        open={lightboxSrc !== null}
+        onClose={() => setLightboxSrc(null)}
+        maxWidth={false}
+        PaperProps={{
+          sx: {
+            bgcolor: "transparent",
+            boxShadow: "none",
+            m: 2,
+          },
+        }}
+        slotProps={{ backdrop: { sx: { bgcolor: "rgba(0,0,0,0.85)" } } }}
+      >
+        {lightboxSrc && (
+          <img
+            src={lightboxSrc}
+            alt=""
+            onClick={() => setLightboxSrc(null)}
+            style={{
+              maxWidth: "90vw",
+              maxHeight: "90vh",
+              borderRadius: 12,
+              display: "block",
+              cursor: "zoom-out",
+            }}
+          />
+        )}
+      </Dialog>
     </Row>
   );
 }

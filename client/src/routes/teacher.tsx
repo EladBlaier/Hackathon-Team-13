@@ -75,8 +75,14 @@ function TeacherPage() {
   useEffect(() => {
     if (typeof window === "undefined") return;
     const u = getUser();
-    if (!u) { navigate({ to: "/" }); return; }
-    if (u.role !== "teacher") { navigate({ to: "/home" }); return; }
+    if (!u) {
+      navigate({ to: "/" });
+      return;
+    }
+    if (u.role !== "teacher") {
+      navigate({ to: "/home" });
+      return;
+    }
     getTeacherStudents(u.id).then(setStudents);
   }, [navigate]);
 
@@ -247,17 +253,24 @@ function TeacherPage() {
         </div>
 
         {students === null ? (
-          <EmptyBox><CircularProgress /></EmptyBox>
+          <EmptyBox>
+            <CircularProgress />
+          </EmptyBox>
         ) : students.length === 0 ? (
           <EmptyBox>
             <PersonIcon sx={{ fontSize: 48, mb: 1 }} />
             <Typography>No students yet.</Typography>
-            <Typography variant="body2">Use "Add student" to link a student by their username.</Typography>
+            <Typography variant="body2">
+              Use "Add student" to link a student by their username.
+            </Typography>
           </EmptyBox>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {students.map((s) => (
-              <StudentCard key={s.user_id}>
+              <StudentCard
+                key={s.user_id}
+                onClick={() => navigate({ to: "/students/$id", params: { id: s.user_id } })}
+              >
                 <Avatar sx={{ width: 36, height: 36, bgcolor: "primary.main" }}>
                   <PersonIcon fontSize="small" />
                 </Avatar>
@@ -277,9 +290,11 @@ function TeacherPage() {
                       onClick={() => handleRemoveStudent(s.user_id)}
                       disabled={removingId === s.user_id}
                     >
-                      {removingId === s.user_id
-                        ? <CircularProgress size={16} color="error" />
-                        : <DeleteIcon fontSize="small" />}
+                      {removingId === s.user_id ? (
+                        <CircularProgress size={16} color="error" />
+                      ) : (
+                        <DeleteIcon fontSize="small" />
+                      )}
                     </IconButton>
                   </span>
                 </Tooltip>
@@ -522,12 +537,17 @@ function TeacherPage() {
           <TextField
             label="Username"
             value={usernameInput}
-            onChange={(e) => { setUsernameInput(e.target.value); setAddError(null); }}
+            onChange={(e) => {
+              setUsernameInput(e.target.value);
+              setAddError(null);
+            }}
             fullWidth
             autoFocus
             helperText={addError ?? "Enter the student's username"}
             error={!!addError}
-            onKeyDown={(e) => { if (e.key === "Enter") handleAddStudent(); }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleAddStudent();
+            }}
           />
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
