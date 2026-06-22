@@ -21,8 +21,6 @@ export const Route = createFileRoute("/")({
   component: LoginPage,
 });
 
-type Role = "student" | "teacher";
-
 function LoginPage() {
   const navigate = useNavigate();
   const [mode, setMode] = useState<"login" | "signup">("login");
@@ -102,7 +100,9 @@ function LoginPage() {
             <ToggleButtonGroup
               value={role}
               exclusive
-              onChange={(_, v) => { if (v) setRole(v); }}
+              onChange={(_, v) => {
+                if (v) setRole(v);
+              }}
               fullWidth
               size="small"
             >
@@ -112,7 +112,13 @@ function LoginPage() {
           )}
 
           <Button type="submit" variant="contained" size="large" disabled={!canSubmit}>
-            {loading ? (isSignup ? "Creating account…" : "Signing in…") : isSignup ? "Create account" : "Sign in"}
+            {loading
+              ? isSignup
+                ? "Creating account…"
+                : "Signing in…"
+              : isSignup
+                ? "Create account"
+                : "Sign in"}
           </Button>
         </FormCard>
 

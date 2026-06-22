@@ -1,6 +1,15 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Box, Button, Chip, CircularProgress, MenuItem, Paper, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Chip,
+  CircularProgress,
+  MenuItem,
+  Paper,
+  TextField,
+  Typography,
+} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import BookIcon from "@mui/icons-material/MenuBook";
 import HistoryIcon from "@mui/icons-material/History";
@@ -147,7 +156,11 @@ function PracticeNext() {
   if (concepts.length === 0) return null;
 
   const difficultyLabel =
-    next?.difficulty === "harder" ? "Level up" : next?.difficulty === "easier" ? "Build the basics" : "Keep going";
+    next?.difficulty === "harder"
+      ? "Level up"
+      : next?.difficulty === "easier"
+        ? "Build the basics"
+        : "Keep going";
 
   async function start() {
     if (!picked) return;
@@ -179,7 +192,13 @@ function PracticeNext() {
           Practice next
         </Typography>
         {next ? (
-          <Chip size="small" label={difficultyLabel} color="primary" variant="outlined" sx={{ ml: "auto" }} />
+          <Chip
+            size="small"
+            label={difficultyLabel}
+            color="primary"
+            variant="outlined"
+            sx={{ ml: "auto" }}
+          />
         ) : null}
       </Box>
 
@@ -193,7 +212,11 @@ function PracticeNext() {
           sx={{ minWidth: 200, "& .MuiInputBase-input": { direction: "rtl", textAlign: "right" } }}
         >
           {concepts.map((c) => (
-            <MenuItem key={c.concept} value={c.concept} sx={{ direction: "rtl", justifyContent: "flex-end" }}>
+            <MenuItem
+              key={c.concept}
+              value={c.concept}
+              sx={{ direction: "rtl", justifyContent: "flex-end" }}
+            >
               {c.he_name}
               {next?.concept === c.concept ? " ⭐" : ""}
             </MenuItem>
