@@ -17,6 +17,6 @@ dependencies = [
 # Install dependencies only; don't try to build this repo as a package.
 package = false
 
-[tool.vercel]
-# Documented way to point Vercel at a FastAPI app that isn't a root main.py.
-entrypoint = "api.index:app"
+# Routing is handled by the catch-all rewrite in vercel.json (every path -> the
+# /api/index function, which runs the FastAPI app). We don't rely on Vercel's
+# FastAPI framework auto-detection (the project's framework preset is null).
