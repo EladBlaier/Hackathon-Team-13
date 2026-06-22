@@ -1,8 +1,16 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
-import { Button, TextField, Typography } from "@mui/material";
+import { Button, TextField, Typography, ToggleButton } from "@mui/material";
 import { login, getUser } from "@/lib/api";
-import { PageRoot, Container, Brand, LogoMark, FormCard, Hint } from "./index.style";
+import {
+  PageRoot,
+  Container,
+  Brand,
+  LogoMark,
+  FormCard,
+  Hint,
+  RoleToggleGroup,
+} from "./index.style";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -16,9 +24,12 @@ export const Route = createFileRoute("/")({
   component: LoginPage,
 });
 
+type Role = "student" | "teacher";
+
 function LoginPage() {
   const navigate = useNavigate();
   const [id, setId] = useState("");
+  const [role, setRole] = useState<Role>("student");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -30,7 +41,7 @@ function LoginPage() {
     if (!id.trim()) return;
     setLoading(true);
     await login(id.trim());
-    navigate({ to: "/home" });
+    navigate({ to: role === "teacher" ? "/teacher-home" : "/home" });
   }
 
   return (
@@ -45,6 +56,19 @@ function LoginPage() {
             Your friendly math homework buddy
           </Typography>
         </Brand>
+
+        <RoleToggleGroup
+          value={role}
+          exclusive
+          fullWidth
+          onChange={(_, value) => {
+            if (value) setRole(value);
+          }}
+        >
+          <ToggleButton value="student">Student</ToggleButton>
+          <ToggleButton value="teacher">Teacher</ToggleButton>
+        </RoleToggleGroup>
+
         <FormCard onSubmit={handleSubmit}>
           <TextField
             label="Your ID"
