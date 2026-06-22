@@ -12,7 +12,13 @@ import os
 from google import genai
 from google.genai import types
 
-from app.ai.prompts import ANALYSIS_PROMPT, AnalysisResult
+from app.ai.prompts import (
+    ANALYSIS_PROMPT,
+    CONTEXT_SUMMARY_PROMPT,
+    PLAN_PROMPT,
+    AnalysisResult,
+)
+from app.schemas.tutor import TutoringPlan
 
 # Free-tier, vision-capable, good at math. Confirm the current free model id
 # at https://aistudio.google.com/ — kept here so it changes in one place.
@@ -51,14 +57,50 @@ def analyze(image_bytes: bytes, mime_type: str = "image/jpeg") -> AnalysisResult
     return AnalysisResult.model_validate(parsed)
 
 
+def plan(system: str, context: str) -> TutoringPlan:
+    """Call B — structured private plan the tutor commits to before replying.
+
+    Forcing a small schema-checked plan out of the weak free model yields far
+    more deliberate pedagogy than a single unstructured reply call.
+    """
+    resp = _get_client().models.generate_content(
+        model=MODEL,
+        contents=[f"{PLAN_PROMPT}\n\n{context}"],
+        config=types.GenerateContentConfig(
+            system_instruction=system,
+            response_mime_type="application/json",
+            response_schema=TutoringPlan,
+            max_output_tokens=400,
+        ),
+    )
+    parsed = resp.parsed
+    if isinstance(parsed, TutoringPlan):
+        return parsed
+    return TutoringPlan.model_validate(parsed)
+
+
 def tutor(system: str, context: str) -> str:
-    """Call B — the human-facing tutoring reply (bounded system prompt)."""
+    """Call C — the human-facing tutoring reply (bounded system prompt)."""
     resp = _get_client().models.generate_content(
         model=MODEL,
         contents=[context],
         config=types.GenerateContentConfig(
             system_instruction=system,
-            max_output_tokens=400,
+            max_output_tokens=600,
         ),
+    )
+    return (resp.text or "").strip()
+
+
+def summarize(prev_summary: str, latest_exchange: str) -> str:
+    """Compact the running conversation memory after each turn (context.json)."""
+    resp = _get_client().models.generate_content(
+        model=MODEL,
+        contents=[
+            f"{CONTEXT_SUMMARY_PROMPT}\n\n"
+            f"Previous summary:\n{prev_summary or '(none yet)'}\n\n"
+            f"Latest exchange:\n{latest_exchange}"
+        ],
+        config=types.GenerateContentConfig(max_output_tokens=200),
     )
     return (resp.text or "").strip()

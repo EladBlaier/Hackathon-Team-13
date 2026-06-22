@@ -21,3 +21,14 @@ def turn_homework_key(
 
 def turn_response_key(student_id: str, conversation_id: str, turn: int) -> str:
     return f"{conversation_prefix(student_id, conversation_id)}turn_{turn:02d}_response.json"
+
+
+def profile_key(student_id: str) -> str:
+    """Student-level learner profile, shared across all of a student's conversations."""
+    return f"students/{student_id}/profile.json"
+
+
+def context_key(student_id: str, conversation_id: str) -> str:
+    """Per-conversation managed-history file. Lives inside the conversation prefix
+    but is ignored by turn parsing (it matches no turn_* pattern)."""
+    return f"{conversation_prefix(student_id, conversation_id)}context.json"

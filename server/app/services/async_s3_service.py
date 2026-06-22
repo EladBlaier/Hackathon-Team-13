@@ -138,11 +138,20 @@ class AsyncS3Service:
         """
         async with self._s3_client() as client:
             try:
-                return await client.generate_presigned_url(
+                url = await client.generate_presigned_url(
                     "get_object",
                     Params={"Bucket": bucket_name, "Key": key},
                     ExpiresIn=expires_in,
                 )
+                # Replace the internal Docker endpoint with the browser-reachable
+                # public URL when one is configured.
+                if url and self.settings.s3_public_url and self.settings.s3_endpoint_url:
+                    url = url.replace(
+                        self.settings.s3_endpoint_url,
+                        self.settings.s3_public_url.rstrip("/"),
+                        1,
+                    )
+                return url
             except Exception as e:
                 logger.error(f"Failed to presign S3 key '{key}': {e}")
                 return None

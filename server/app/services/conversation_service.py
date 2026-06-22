@@ -86,13 +86,26 @@ class ConversationService:
         feedback_data: dict[str, Any],
         images: list[ImageUpload],
     ) -> PostTurnResult:
-        meta = meta_key(student_id, conversation_id)
+        meta_k = meta_key(student_id, conversation_id)
         response = turn_response_key(student_id, conversation_id, turn_number)
 
+        # Read existing meta so we can merge without losing previously stored keys.
+        try:
+            existing_meta: dict[str, Any] = await self._s3.get_object_as_json(
+                self._bucket, meta_k
+            )
+        except FileKeyNotFoundError:
+            existing_meta = {}
+
+        meta_payload: dict[str, Any] = {**existing_meta, "name": conversation_name}
+        if turn_number == 0 and images and "first_image_key" not in existing_meta:
+            ext = get_file_extension(images[0].filename)
+            meta_payload["first_image_key"] = turn_homework_key(
+                student_id, conversation_id, 0, 0, ext
+            )
+
         upload_tasks: list[Any] = [
-            self._s3.put_object_json(
-                self._bucket, meta, {"name": conversation_name}
-            ),
+            self._s3.put_object_json(self._bucket, meta_k, meta_payload),
             self._s3.put_object_json(self._bucket, response, feedback_data),
         ]
 
@@ -126,10 +139,17 @@ class ConversationService:
     async def _fetch_conversation_meta(
         self, student_id: str, conversation_id: str
     ) -> ConversationSummary:
-        name = await self._fetch_conversation_name(
-            student_id, conversation_id, conversation_id
-        )
-        return ConversationSummary(id=conversation_id, name=name)
+        key = meta_key(student_id, conversation_id)
+        try:
+            meta = await self._s3.get_object_as_json(self._bucket, key)
+        except FileKeyNotFoundError:
+            meta = {}
+        name = meta.get("name", conversation_id)
+        cover_url: str | None = None
+        first_image_key = meta.get("first_image_key")
+        if first_image_key:
+            cover_url = await self._s3.generate_presigned_url(self._bucket, first_image_key)
+        return ConversationSummary(id=conversation_id, name=name, cover_image_url=cover_url)
 
     async def _fetch_conversation_name(
         self, student_id: str, conversation_id: str, fallback: str

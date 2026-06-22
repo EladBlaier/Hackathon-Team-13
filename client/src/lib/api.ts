@@ -67,6 +67,7 @@ function studentId(): string {
 interface ConversationSummary {
   id: string;
   name: string;
+  cover_image_url?: string | null;
 }
 interface AiFeedback {
   reply?: string;
@@ -178,6 +179,7 @@ export async function listHomeworks(): Promise<Homework[]> {
     title: c.name,
     subject: "Math",
     status: "reviewing" as HomeworkStatus,
+    coverImage: c.cover_image_url ?? undefined,
     images: [],
     messages: [],
     createdAt: 0,

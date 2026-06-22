@@ -78,6 +78,8 @@ export const Bubble = styled(Box, {
   backgroundColor: isStudent ? theme.palette.primary.main : theme.palette.background.paper,
   color: isStudent ? theme.palette.primary.contrastText : theme.palette.text.primary,
   border: isStudent ? "none" : `1px solid ${theme.palette.divider}`,
+  direction: isStudent ? "ltr" : "rtl",
+  textAlign: isStudent ? "left" : "right",
 }));
 
 export const TypingBubbleEl = styled(Box)(({ theme }) => ({

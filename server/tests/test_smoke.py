@@ -21,6 +21,37 @@ from app.ai.prompts import (  # noqa: E402
     AnalysisResult,
     build_tutor_system,
 )
+from app.config import settings as app_settings  # noqa: E402
+from app.exceptions import FileKeyNotFoundError  # noqa: E402
+from app.schemas.tutor import (  # noqa: E402
+    ConversationContext,
+    LearnerProfile,
+    TutoringPlan,
+)
+
+
+class FakeS3:
+    """In-memory stand-in for AsyncS3Service's JSON get/put used by the brain."""
+
+    def __init__(self) -> None:
+        self.store: dict[str, object] = {}
+
+    async def get_object_as_json(self, bucket: str, key: str):
+        if key not in self.store:
+            raise FileKeyNotFoundError(bucket, key)
+        return self.store[key]
+
+    async def put_object_json(self, bucket: str, key: str, data) -> None:
+        self.store[key] = data
+
+
+def _fake_plan(*_a, **_k) -> TutoringPlan:
+    return TutoringPlan(
+        misconception="forgot common denominator",
+        next_move="ask for the common denominator",
+        do_not_reveal="the final sum",
+        guiding_question="What is the common denominator?",
+    )
 
 
 # --- Prompt budget / style rules (ported from the AI-engine branch) ----------
@@ -58,10 +89,15 @@ def _make_client(monkeypatch):
 
     monkeypatch.setattr(llm, "analyze", lambda *a, **k: _fake_analysis())
     monkeypatch.setattr(llm, "tutor", lambda system, context: "What is the common denominator?")
+    monkeypatch.setattr(llm, "plan", _fake_plan)
+    monkeypatch.setattr(llm, "summarize", lambda prev, latest: "session summary")
 
     from app.main import app
-    from app.dependencies import get_conversation_service
+    from app.dependencies import get_conversation_service, get_tutor_ai_service
     from app.schemas.tutor import PostTurnResult
+    from app.services.context_service import ContextService
+    from app.services.profile_service import ProfileService
+    from app.services.tutor_ai_service import TutorAIService
 
     class FakeConversationService:
         def __init__(self):
@@ -84,7 +120,13 @@ def _make_client(monkeypatch):
             )
 
     fake = FakeConversationService()
+    fake_s3 = FakeS3()
+    profiles = ProfileService(fake_s3, app_settings)
+    contexts = ContextService(fake_s3, app_settings, fake)
+    ai = TutorAIService(profiles, contexts, app_settings)
+
     app.dependency_overrides[get_conversation_service] = lambda: fake
+    app.dependency_overrides[get_tutor_ai_service] = lambda: ai
     return TestClient(app), fake
 
 
@@ -163,3 +205,126 @@ def test_empty_turn_rejected(monkeypatch):
         assert resp.status_code == 400
     finally:
         client.app.dependency_overrides.clear()
+
+
+# --- Adaptation: deterministic mastery math (no S3, no LLM) -------------------
+
+def test_profile_records_mastery_and_ranks_struggle():
+    p = LearnerProfile()
+    p.record("fractions", is_correct=False, error_type="arithmetic")
+    p.record("fractions", is_correct=False, error_type="sign")
+    p.record("decimals", is_correct=True, error_type="none")
+
+    assert p.total_turns == 3
+    assert p.concepts["fractions"].attempts == 2
+    assert p.concepts["fractions"].correct == 0
+    assert p.concepts["decimals"].accuracy == 1.0
+
+    summary = p.struggle_summary()
+    assert "fractions" in summary  # weakest concept surfaces
+    assert "sign" in summary  # carries the latest error type
+    assert "decimals" not in summary  # all-correct concept is not a struggle
+
+
+def test_profile_struggle_empty_when_no_evidence():
+    assert LearnerProfile().struggle_summary() == ""
+    p = LearnerProfile()
+    p.record("fractions", is_correct=True, error_type="none")
+    assert p.struggle_summary() == ""
+
+
+def test_profile_defaults_match_legacy_behaviour():
+    # A cold-start profile must reproduce the old fixed defaults exactly.
+    p = LearnerProfile()
+    assert (p.style, p.pace, p.grade, p.confidence) == ("step_by_step", "normal", 6, "med")
+
+
+# --- Managed history: context trimming + rolling summary ----------------------
+
+def test_context_update_trims_to_two_and_summarizes(monkeypatch):
+    import asyncio
+
+    from app.services.context_service import ContextService
+
+    monkeypatch.setattr(llm, "summarize", lambda prev, latest: "running summary")
+
+    class _NoHistoryConv:
+        async def get_history(self, *a, **k):
+            from app.exceptions import ConversationNotFoundError
+
+            raise ConversationNotFoundError("s", "c")
+
+    contexts = ContextService(FakeS3(), app_settings, _NoHistoryConv())
+    ctx = ConversationContext()
+
+    async def run():
+        for i in range(3):
+            await contexts.update(
+                "s", "c", ctx, student_text=f"msg{i}", analysis=None, reply=f"reply{i}"
+            )
+
+    asyncio.run(run())
+
+    assert ctx.turn_count == 3
+    assert len(ctx.recent_exchanges) == 2  # only the last two kept verbatim
+    assert ctx.recent_exchanges[-1].student == "msg2"
+    assert ctx.rolling_summary == "running summary"
+    # render() exposes the memory as a prompt-ready block
+    rendered = ctx.render()
+    assert "running summary" in rendered
+    assert "msg2" in rendered
+
+
+# --- Verdict branching: the graded result drives the tutor directive ----------
+
+def _situation_text(analysis):
+    from app.services.tutor_ai_service import TutorAIService
+
+    return "\n".join(TutorAIService._situation(analysis, student_text=""))
+
+
+def test_correct_answer_directive_affirms_and_asks_whats_next():
+    analysis = AnalysisResult(
+        problem="2/3 + 1/4",
+        is_correct=True,
+        error_type="none",
+        concept="fractions",
+        confidence=0.95,
+        student_answer="11/12",
+        observation="found a common denominator of 12 correctly",
+    )
+    text = _situation_text(analysis)
+    assert "CORRECT" in text
+    assert "what they'd like to do next" in text
+    assert "common denominator of 12" in text  # grounded in the observation
+
+
+def test_wrong_answer_directive_guides_to_fix():
+    analysis = AnalysisResult(
+        problem="2/3 + 1/4",
+        is_correct=False,
+        error_type="arithmetic",
+        concept="fractions",
+        confidence=0.9,
+        student_answer="3/7",
+        observation="added numerators and denominators directly",
+    )
+    text = _situation_text(analysis)
+    assert "INCORRECT" in text
+    assert "arithmetic" in text and "fractions" in text
+    assert "without revealing the answer" in text
+
+
+def test_low_confidence_directive_asks_to_confirm():
+    analysis = AnalysisResult(
+        problem="(unclear)",
+        is_correct=False,
+        error_type="none",
+        concept="unknown",
+        confidence=0.2,  # below LOW_CONFIDENCE
+        student_answer="",
+        observation="",
+    )
+    text = _situation_text(analysis)
+    assert "confirm or re-share" in text
+    assert "CORRECT" not in text  # must not pretend to have graded it
