@@ -1,8 +1,6 @@
 import { styled, alpha } from "@mui/material/styles";
 import { Box, Paper, Fab } from "@mui/material";
-import { createLink } from "@tanstack/react-router";
-
-const RouterLink = createLink("a");
+import { Link as RouterLink } from "@tanstack/react-router";
 
 export const PageRoot = styled(Box)({
   minHeight: "100vh",
