@@ -19,11 +19,7 @@ export function AppHeader({ title, back, showLogout, right }: AppHeaderProps) {
     <StyledAppBar position="sticky" elevation={0}>
       <HeaderToolbar disableGutters>
         {back ? (
-          <IconButton
-            edge="start"
-            aria-label="Back"
-            onClick={() => navigate({ to: back })}
-          >
+          <IconButton edge="start" aria-label="Back" onClick={() => navigate({ to: back })}>
             <ArrowBackIcon />
           </IconButton>
         ) : null}

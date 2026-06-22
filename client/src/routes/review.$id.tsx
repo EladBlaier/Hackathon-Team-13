@@ -5,13 +5,7 @@ import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import SendIcon from "@mui/icons-material/Send";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
-import {
-  appendMessage,
-  getHomework,
-  getUser,
-  type Homework,
-  type ChatMessage,
-} from "@/lib/api";
+import { appendMessage, getHomework, getUser, type Homework, type ChatMessage } from "@/lib/api";
 import { AppHeader } from "@/components/AppHeader";
 import { filesToDataUrls } from "@/lib/file-utils";
 import {
@@ -123,7 +117,8 @@ function ReviewPage() {
           <InfoBanner>
             <AutoAwesomeIcon sx={{ fontSize: 16, mt: "2px", flexShrink: 0 }} />
             <span>
-              MathPal is reviewing your work. Ask questions, share more photos, or walk through your steps.
+              MathPal is reviewing your work. Ask questions, share more photos, or walk through your
+              steps.
             </span>
           </InfoBanner>
 

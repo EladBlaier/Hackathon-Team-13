@@ -124,8 +124,7 @@ export const TileGradient = styled(Box)(({ theme }) => ({
 export const TileShade = styled(Box)({
   position: "absolute",
   inset: 0,
-  background:
-    "linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0.1) 50%, transparent)",
+  background: "linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0.1) 50%, transparent)",
 });
 
 export const TileMeta = styled(Box)(({ theme }) => ({
@@ -164,11 +163,7 @@ export const StatusDotEl = styled("span", {
   height: 6,
   borderRadius: "50%",
   backgroundColor:
-    status === "completed"
-      ? "#34d399"
-      : status === "reviewing"
-        ? "#fbbf24"
-        : "#cbd5e1",
+    status === "completed" ? "#34d399" : status === "reviewing" ? "#fbbf24" : "#cbd5e1",
   animation: status === "reviewing" ? "blink 1.2s ease-in-out infinite" : "none",
   "@keyframes blink": {
     "0%, 100%": { opacity: 1 },

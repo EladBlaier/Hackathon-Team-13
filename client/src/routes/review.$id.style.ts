@@ -75,12 +75,8 @@ export const Bubble = styled(Box, {
   padding: theme.spacing(1.25, 2),
   fontSize: "0.875rem",
   lineHeight: 1.5,
-  backgroundColor: isStudent
-    ? theme.palette.primary.main
-    : theme.palette.background.paper,
-  color: isStudent
-    ? theme.palette.primary.contrastText
-    : theme.palette.text.primary,
+  backgroundColor: isStudent ? theme.palette.primary.main : theme.palette.background.paper,
+  color: isStudent ? theme.palette.primary.contrastText : theme.palette.text.primary,
   border: isStudent ? "none" : `1px solid ${theme.palette.divider}`,
 }));
 

@@ -1,20 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
-import {
-  Button,
-  TextField,
-  MenuItem,
-  Typography,
-} from "@mui/material";
+import { Button, TextField, MenuItem, Typography } from "@mui/material";
 import { login, getUser } from "@/lib/api";
-import {
-  PageRoot,
-  Container,
-  Brand,
-  LogoMark,
-  FormCard,
-  Hint,
-} from "./index.style";
+import { PageRoot, Container, Brand, LogoMark, FormCard, Hint } from "./index.style";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -66,23 +54,13 @@ function LoginPage() {
             placeholder="e.g. Alex"
             autoFocus
           />
-          <TextField
-            select
-            label="Grade"
-            value={grade}
-            onChange={(e) => setGrade(e.target.value)}
-          >
+          <TextField select label="Grade" value={grade} onChange={(e) => setGrade(e.target.value)}>
             <MenuItem value="6">6th grade</MenuItem>
             <MenuItem value="7">7th grade</MenuItem>
             <MenuItem value="8">8th grade</MenuItem>
             <MenuItem value="9">9th grade</MenuItem>
           </TextField>
-          <Button
-            type="submit"
-            variant="contained"
-            size="large"
-            disabled={loading || !name.trim()}
-          >
+          <Button type="submit" variant="contained" size="large" disabled={loading || !name.trim()}>
             {loading ? "Signing in…" : "Let's go"}
           </Button>
         </FormCard>

@@ -111,11 +111,7 @@ function HomePage() {
         </section>
       </Main>
 
-      <Floating
-        color="primary"
-        aria-label="Add homework"
-        onClick={() => navigate({ to: "/new" })}
-      >
+      <Floating color="primary" aria-label="Add homework" onClick={() => navigate({ to: "/new" })}>
         <AddIcon />
       </Floating>
     </PageRoot>
@@ -131,11 +127,7 @@ function EmptyState() {
       <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
         Tap the + to add your first one
       </Typography>
-      <Button
-        variant="contained"
-        startIcon={<AddIcon />}
-        onClick={() => navigate({ to: "/new" })}
-      >
+      <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate({ to: "/new" })}>
         Add homework
       </Button>
     </EmptyCard>
@@ -145,11 +137,7 @@ function EmptyState() {
 export function HomeworkCard({ hw }: { hw: Homework }) {
   return (
     <HomeworkTile to="/review/$id" params={{ id: hw.id } as never}>
-      {hw.coverImage ? (
-        <TileImage src={hw.coverImage} alt={hw.title} />
-      ) : (
-        <TileGradient />
-      )}
+      {hw.coverImage ? <TileImage src={hw.coverImage} alt={hw.title} /> : <TileGradient />}
       <TileShade />
       <TileMeta>
         <TileStatusRow>

@@ -59,9 +59,7 @@ export const PickerTile = styled("button", {
   aspectRatio: "1 / 1",
   borderRadius: 12,
   border: `2px dashed ${primary ? alpha(theme.palette.primary.main, 0.4) : theme.palette.divider}`,
-  backgroundColor: primary
-    ? alpha(theme.palette.primary.main, 0.05)
-    : "transparent",
+  backgroundColor: primary ? alpha(theme.palette.primary.main, 0.05) : "transparent",
   color: primary ? theme.palette.primary.main : theme.palette.text.secondary,
   display: "flex",
   flexDirection: "column",
@@ -73,9 +71,7 @@ export const PickerTile = styled("button", {
   fontWeight: 500,
   transition: "background-color 150ms ease",
   "&:hover": {
-    backgroundColor: primary
-      ? alpha(theme.palette.primary.main, 0.1)
-      : theme.palette.action.hover,
+    backgroundColor: primary ? alpha(theme.palette.primary.main, 0.1) : theme.palette.action.hover,
   },
 }));
 
