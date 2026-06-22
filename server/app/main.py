@@ -11,6 +11,8 @@ from app.config import settings
 from app.dependencies import get_async_s3_service, get_s3_session, get_settings
 from app.exceptions import register_exception_handlers
 from app.routers import tutor
+from app.routers import auth as auth_router
+from app.routers import teacher as teacher_router
 
 logging.basicConfig(
     level=logging.INFO,
@@ -28,6 +30,8 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     try:
         await s3_service.ensure_bucket_exists(settings.s3_default_bucket)
         logger.info(f"Default S3 bucket '{settings.s3_default_bucket}' is ready.")
+        await s3_service.ensure_bucket_exists(settings.s3_teachers_bucket)
+        logger.info(f"Teachers S3 bucket '{settings.s3_teachers_bucket}' is ready.")
     except Exception as e:
         logger.error(
             f"Could not connect to S3/MinIO service during startup or create bucket: {e}. "
@@ -57,6 +61,8 @@ app.add_middleware(
 )
 
 register_exception_handlers(app)
+app.include_router(auth_router.router)
+app.include_router(teacher_router.router)
 app.include_router(tutor.router)
 
 

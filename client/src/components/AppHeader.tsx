@@ -1,9 +1,9 @@
 import type { ReactNode } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { IconButton } from "@mui/material";
+import { IconButton, Typography } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import LogoutIcon from "@mui/icons-material/Logout";
-import { logout } from "@/lib/api";
+import { logout, getUser } from "@/lib/api";
 import { StyledAppBar, HeaderToolbar, Title, RightSlot } from "./AppHeader.style";
 
 export interface AppHeaderProps {
@@ -15,6 +15,7 @@ export interface AppHeaderProps {
 
 export function AppHeader({ title, back, showLogout, right }: AppHeaderProps) {
   const navigate = useNavigate();
+  const username = typeof window !== "undefined" ? getUser()?.username : undefined;
   return (
     <StyledAppBar position="sticky" elevation={0}>
       <HeaderToolbar disableGutters>
@@ -28,6 +29,14 @@ export function AppHeader({ title, back, showLogout, right }: AppHeaderProps) {
         </Title>
         <RightSlot>
           {right}
+          {showLogout && username ? (
+            <Typography
+              variant="body2"
+              sx={{ opacity: 0.65, fontWeight: 500, whiteSpace: "nowrap" }}
+            >
+              {username}
+            </Typography>
+          ) : null}
           {showLogout ? (
             <IconButton
               aria-label="Log out"
