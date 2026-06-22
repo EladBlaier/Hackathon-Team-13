@@ -1,10 +1,20 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState, type FormEvent } from "react";
+import {
+  Button,
+  TextField,
+  MenuItem,
+  Typography,
+} from "@mui/material";
 import { login, getUser } from "@/lib/api";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  PageRoot,
+  Container,
+  Brand,
+  LogoMark,
+  FormCard,
+  Hint,
+} from "./index.style";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -28,7 +38,7 @@ function LoginPage() {
     if (getUser()) navigate({ to: "/home" });
   }, [navigate]);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     if (!name.trim()) return;
     setLoading(true);
@@ -37,50 +47,47 @@ function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-background">
-      <div className="w-full max-w-sm">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-3xl bg-primary text-primary-foreground text-3xl font-bold mb-4 shadow-lg shadow-primary/20">
-            π
-          </div>
-          <h1 className="text-3xl font-bold tracking-tight">MathPal</h1>
-          <p className="text-muted-foreground mt-2 text-sm">
+    <PageRoot>
+      <Container>
+        <Brand>
+          <LogoMark>π</LogoMark>
+          <Typography variant="h4" component="h1">
+            MathPal
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
             Your friendly math homework buddy
-          </p>
-        </div>
-        <form onSubmit={handleSubmit} className="bg-card rounded-3xl p-6 shadow-sm border space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Your name</Label>
-            <Input
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Alex"
-              autoFocus
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="grade">Grade</Label>
-            <select
-              id="grade"
-              value={grade}
-              onChange={(e) => setGrade(e.target.value)}
-              className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
-            >
-              <option value="6">6th grade</option>
-              <option value="7">7th grade</option>
-              <option value="8">8th grade</option>
-              <option value="9">9th grade</option>
-            </select>
-          </div>
-          <Button type="submit" className="w-full h-11 rounded-xl" disabled={loading}>
+          </Typography>
+        </Brand>
+        <FormCard component="form" onSubmit={handleSubmit} elevation={0}>
+          <TextField
+            label="Your name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="e.g. Alex"
+            autoFocus
+          />
+          <TextField
+            select
+            label="Grade"
+            value={grade}
+            onChange={(e) => setGrade(e.target.value)}
+          >
+            <MenuItem value="6">6th grade</MenuItem>
+            <MenuItem value="7">7th grade</MenuItem>
+            <MenuItem value="8">8th grade</MenuItem>
+            <MenuItem value="9">9th grade</MenuItem>
+          </TextField>
+          <Button
+            type="submit"
+            variant="contained"
+            size="large"
+            disabled={loading || !name.trim()}
+          >
             {loading ? "Signing in…" : "Let's go"}
           </Button>
-        </form>
-        <p className="text-center text-xs text-muted-foreground mt-6">
-          Demo login — no password needed
-        </p>
-      </div>
-    </div>
+        </FormCard>
+        <Hint>Demo login — no password needed</Hint>
+      </Container>
+    </PageRoot>
   );
 }
