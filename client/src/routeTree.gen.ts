@@ -9,19 +9,14 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TeacherHomeRouteImport } from './routes/teacherHome'
 import { Route as TeacherRouteImport } from './routes/teacher'
 import { Route as NewRouteImport } from './routes/new'
 import { Route as HomeRouteImport } from './routes/home'
 import { Route as HistoryRouteImport } from './routes/history'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as StudentsIdRouteImport } from './routes/students.$id'
 import { Route as ReviewIdRouteImport } from './routes/review.$id'
 
-const TeacherHomeRoute = TeacherHomeRouteImport.update({
-  id: '/teacherHome',
-  path: '/teacherHome',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const TeacherRoute = TeacherRouteImport.update({
   id: '/teacher',
   path: '/teacher',
@@ -47,6 +42,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StudentsIdRoute = StudentsIdRouteImport.update({
+  id: '/students/$id',
+  path: '/students/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ReviewIdRoute = ReviewIdRouteImport.update({
   id: '/review/$id',
   path: '/review/$id',
@@ -59,8 +59,8 @@ export interface FileRoutesByFullPath {
   '/home': typeof HomeRoute
   '/new': typeof NewRoute
   '/teacher': typeof TeacherRoute
-  '/teacherHome': typeof TeacherHomeRoute
   '/review/$id': typeof ReviewIdRoute
+  '/students/$id': typeof StudentsIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -68,8 +68,8 @@ export interface FileRoutesByTo {
   '/home': typeof HomeRoute
   '/new': typeof NewRoute
   '/teacher': typeof TeacherRoute
-  '/teacherHome': typeof TeacherHomeRoute
   '/review/$id': typeof ReviewIdRoute
+  '/students/$id': typeof StudentsIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -78,8 +78,8 @@ export interface FileRoutesById {
   '/home': typeof HomeRoute
   '/new': typeof NewRoute
   '/teacher': typeof TeacherRoute
-  '/teacherHome': typeof TeacherHomeRoute
   '/review/$id': typeof ReviewIdRoute
+  '/students/$id': typeof StudentsIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -89,8 +89,8 @@ export interface FileRouteTypes {
     | '/home'
     | '/new'
     | '/teacher'
-    | '/teacherHome'
     | '/review/$id'
+    | '/students/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -98,8 +98,8 @@ export interface FileRouteTypes {
     | '/home'
     | '/new'
     | '/teacher'
-    | '/teacherHome'
     | '/review/$id'
+    | '/students/$id'
   id:
     | '__root__'
     | '/'
@@ -107,8 +107,8 @@ export interface FileRouteTypes {
     | '/home'
     | '/new'
     | '/teacher'
-    | '/teacherHome'
     | '/review/$id'
+    | '/students/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -117,19 +117,12 @@ export interface RootRouteChildren {
   HomeRoute: typeof HomeRoute
   NewRoute: typeof NewRoute
   TeacherRoute: typeof TeacherRoute
-  TeacherHomeRoute: typeof TeacherHomeRoute
   ReviewIdRoute: typeof ReviewIdRoute
+  StudentsIdRoute: typeof StudentsIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/teacherHome': {
-      id: '/teacherHome'
-      path: '/teacherHome'
-      fullPath: '/teacherHome'
-      preLoaderRoute: typeof TeacherHomeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/teacher': {
       id: '/teacher'
       path: '/teacher'
@@ -165,6 +158,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/students/$id': {
+      id: '/students/$id'
+      path: '/students/$id'
+      fullPath: '/students/$id'
+      preLoaderRoute: typeof StudentsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/review/$id': {
       id: '/review/$id'
       path: '/review/$id'
@@ -181,8 +181,8 @@ const rootRouteChildren: RootRouteChildren = {
   HomeRoute: HomeRoute,
   NewRoute: NewRoute,
   TeacherRoute: TeacherRoute,
-  TeacherHomeRoute: TeacherHomeRoute,
   ReviewIdRoute: ReviewIdRoute,
+  StudentsIdRoute: StudentsIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

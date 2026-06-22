@@ -50,7 +50,11 @@ export async function login(username: string, password: string): Promise<User> {
   return user;
 }
 
-export async function signup(username: string, password: string, role: "student" | "teacher"): Promise<User> {
+export async function signup(
+  username: string,
+  password: string,
+  role: "student" | "teacher",
+): Promise<User> {
   const { data } = await api.post<{ user_id: string; username: string; role: string }>(
     "/auth/register",
     { username, password, role },
@@ -89,12 +93,18 @@ export async function getTeacherStudents(teacherId: string): Promise<StudentEntr
   return data;
 }
 
-export async function addStudentToTeacher(teacherId: string, username: string): Promise<StudentEntry[]> {
+export async function addStudentToTeacher(
+  teacherId: string,
+  username: string,
+): Promise<StudentEntry[]> {
   const { data } = await api.post<StudentEntry[]>(`/teachers/${teacherId}/students`, { username });
   return data;
 }
 
-export async function removeStudentFromTeacher(teacherId: string, studentId: string): Promise<StudentEntry[]> {
+export async function removeStudentFromTeacher(
+  teacherId: string,
+  studentId: string,
+): Promise<StudentEntry[]> {
   const { data } = await api.delete<StudentEntry[]>(`/teachers/${teacherId}/students/${studentId}`);
   return data;
 }
