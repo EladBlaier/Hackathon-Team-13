@@ -64,6 +64,9 @@ export const BubbleImage = styled("img")(({ theme }) => ({
   width: "100%",
   objectFit: "cover",
   border: `1px solid ${theme.palette.divider}`,
+  cursor: "pointer",
+  transition: "opacity 0.15s",
+  "&:hover": { opacity: 0.85 },
 }));
 
 export const Bubble = styled(Box, {
