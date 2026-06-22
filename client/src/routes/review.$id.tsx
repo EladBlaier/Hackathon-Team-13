@@ -90,14 +90,36 @@ function ReviewPage() {
     setText("");
     const imgs = pendingImages;
     setPendingImages([]);
+    // Optimistically show the student's message while the tutor "thinks".
+    setHw((prev) =>
+      prev
+        ? {
+            ...prev,
+            messages: [
+              ...prev.messages,
+              {
+                id: `pending-${Date.now()}`,
+                role: "student",
+                text: trimmed || undefined,
+                images: imgs.length ? imgs : undefined,
+                createdAt: Date.now(),
+              },
+            ],
+          }
+        : prev,
+    );
     setTutorTyping(true);
-    await appendMessage(id, {
-      role: "student",
-      text: trimmed || undefined,
-      images: imgs.length ? imgs : undefined,
-    });
-    const fresh = await getHomework(id);
-    if (fresh) setHw(fresh);
+    try {
+      await appendMessage(id, {
+        role: "student",
+        text: trimmed || undefined,
+        images: imgs.length ? imgs : undefined,
+      });
+      const fresh = await getHomework(id);
+      if (fresh) setHw(fresh);
+    } finally {
+      setTutorTyping(false);
+    }
   }
 
   if (!hw) {

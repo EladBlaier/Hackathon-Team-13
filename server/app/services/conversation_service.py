@@ -120,6 +120,7 @@ class ConversationService:
             turn=turn_number,
             image_keys=image_keys,
             response_key=response,
+            ai_feedback=feedback_data,
         )
 
     async def _fetch_conversation_meta(
@@ -154,9 +155,13 @@ class ConversationService:
                     f"Failed to fetch S3 response key '{data.response_key}': {e}"
                 )
 
+        sorted_files = sorted(data.homework_files, key=lambda item: item.index)
+        urls = await asyncio.gather(
+            *(self._s3.generate_presigned_url(self._bucket, hf.key) for hf in sorted_files)
+        )
         homework_files = [
-            HomeworkImage(filename=hf.filename, key=hf.key)
-            for hf in sorted(data.homework_files, key=lambda item: item.index)
+            HomeworkImage(filename=hf.filename, key=hf.key, url=url)
+            for hf, url in zip(sorted_files, urls)
         ]
 
         return TurnHistoryItem(

@@ -1,0 +1,63 @@
+services:
+  s3-server:
+    image: minio/minio:latest
+    container_name: local_s3
+    ports:
+      - "9000:9000"       # S3 API endpoint
+      - "9001:9001"       # Web Console GUI
+    environment:
+      MINIO_ROOT_USER: local-s3-access-key
+      MINIO_ROOT_PASSWORD: local-s3-secret-key
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    restart: always
+
+  fastapi-app:
+    image: fastapi-app:latest
+    build:
+      context: ./server  # <-- Path to the directory containing your FastAPI Dockerfile
+      dockerfile: Dockerfile  # <-- Optional if named 'Dockerfile'
+    container_name: fastapi_app
+    ports:
+      - "8000:8000"
+    environment:
+      S3_ENDPOINT_URL: http://s3-server:9000
+      S3_ACCESS_KEY: local-s3-access-key
+      S3_SECRET_KEY: local-s3-secret-key
+      S3_REGION: us-east-1
+      S3_DEFAULT_BUCKET: hackaton-bucket
+      # AI engine: pulled from a root .env file (GEMINI_API_KEY=...) or your shell.
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+    depends_on:
+      - s3-server
+    restart: always
+
+  web:
+    image: web:latest
+    build:
+      context: ./client          # <-- Path to the directory containing your Web Dockerfile
+      dockerfile: Dockerfile
+    container_name: hintly_web
+    ports:
+      - "8080:8080"  # Forwarding TanStack Start's default port
+    volumes:
+      - ./client:/app             # <-- Change '.' to './web' (or your actual web folder path)
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      # The browser (not the container) calls the API, so use the published host
+      # port of fastapi-app, not the compose service name.
+      - VITE_API_URL=http://localhost:8000
+    depends_on:
+      - fastapi-app
+
+  docker-cleaner:
+    image: docker:cli
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    # This command wipes the dangling layers left behind by the 'build' step above
+    command: docker image prune -f
+
+volumes:
+  minio_data:

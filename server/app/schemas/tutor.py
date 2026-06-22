@@ -15,6 +15,7 @@ class CreateConversationRequest(BaseModel):
 class HomeworkImage(BaseModel):
     filename: str
     key: str
+    url: str | None = None  # presigned GET URL so the frontend can render it
 
 
 class TurnHistoryItem(BaseModel):
@@ -35,3 +36,4 @@ class PostTurnResult(BaseModel):
     turn: int
     image_keys: list[str]
     response_key: str
+    ai_feedback: dict[str, Any]  # the tutor reply the backend just generated

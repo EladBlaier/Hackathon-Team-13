@@ -24,7 +24,9 @@ class AsyncS3Service:
     async def _s3_client(self) -> AsyncIterator[Any]:
         async with self.session.client(
             "s3",
-            endpoint_url=self.settings.s3_endpoint_url,
+            # Empty endpoint => use AWS's default regional endpoint. A non-empty
+            # value targets MinIO / Cloudflare R2 / other S3-compatible stores.
+            endpoint_url=self.settings.s3_endpoint_url or None,
             aws_access_key_id=self.settings.s3_access_key,
             aws_secret_access_key=self.settings.s3_secret_key,
             region_name=self.settings.s3_region,
@@ -125,6 +127,25 @@ class AsyncS3Service:
             except Exception as e:
                 logger.error(f"Failed to upload bytes payload to S3 key '{key}': {e}")
                 raise FileOperationError(f"Failed to upload file bytes: {e}") from e
+
+    async def generate_presigned_url(
+        self, bucket_name: str, key: str, expires_in: int = 3600
+    ) -> str | None:
+        """Returns a time-limited GET URL so the frontend can render the object.
+
+        Never raises: a failure here should degrade gracefully to "no image"
+        rather than break the whole conversation history response.
+        """
+        async with self._s3_client() as client:
+            try:
+                return await client.generate_presigned_url(
+                    "get_object",
+                    Params={"Bucket": bucket_name, "Key": key},
+                    ExpiresIn=expires_in,
+                )
+            except Exception as e:
+                logger.error(f"Failed to presign S3 key '{key}': {e}")
+                return None
 
     async def list_objects(self, bucket_name: str, prefix: str) -> list[str]:
         """Lists all keys matching the prefix."""

@@ -6,6 +6,7 @@ from fastapi import Depends
 from app.config import Settings, settings
 from app.services.async_s3_service import AsyncS3Service
 from app.services.conversation_service import ConversationService
+from app.services.tutor_ai_service import TutorAIService
 
 _s3_session = aioboto3.Session()
 
@@ -35,3 +36,8 @@ def get_conversation_service(
 ) -> ConversationService:
     """Dependency provider for ConversationService."""
     return ConversationService(s3, settings)
+
+
+def get_tutor_ai_service() -> TutorAIService:
+    """Dependency provider for the Gemini-backed tutoring service."""
+    return TutorAIService()

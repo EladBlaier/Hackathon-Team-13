@@ -23,3 +23,9 @@ Thumbs.db          # Windows
 .pytest_cache/
 .coverage
 htmlcov/
+# --- Secrets / local env ---
+.env
+.env.local
+.vercel/
+.venv-server/
+.vercel

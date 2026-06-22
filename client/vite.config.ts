@@ -12,6 +12,9 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  // Force-enable the Nitro deploy plugin (otherwise skipped outside Lovable) and
+  // target Vercel so the build emits .vercel/output. Overridable via NITRO_PRESET.
+  nitro: { preset: process.env.NITRO_PRESET ?? "vercel" },
   vite: {
     ssr: {
       noExternal: ["react-transition-group", "@mui/material"],
